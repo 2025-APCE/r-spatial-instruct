@@ -2,16 +2,23 @@
 # Spatial analysis in R
 # Han Olff nov 2025
 
+
+#--------------------------01 Set up the environment ----
+# run the setup script for user-defined functions and Google Sheets authentication
+source("scripts/01-setup.R")
+# clear the working environment
 rm(list = ls())
+# authenticate Google Sheets access
+gsheets_auth(email='m.y.name@rug.nl')  # change in your own email address
 # set the working directory where your GIS data are located
-setwd("G:/Shared drives/_Org OlffLab/Teaching/APCE/APCE2025/APCE2025GIS")
+setwd("G:/Shared drives/_Org OlffLab/Teaching/APCE/_general/APCE_GIS")
 
 # restore the libraries of the project 
 renv::restore()
 
 
 # load the different libraries
-library(terra)       # for working with raster data
+library(terra)       # for working with raster data (although it also deals with vector data)
 library(tidyterra)   # for adding terra objects to ggplot
 library(ggspatial)  # for scale bars
 library(sf)          # for vector data objects
@@ -24,31 +31,42 @@ library(patchwork)  # for combining multiple ggplots in one panel plot
 # also see https://www.datanovia.com/en/blog/top-r-color-palettes-to-know-for-great-data-visualization/
 # Base R palettes
 barplot(rep(1,10), col = grey.colors(10))
+# each color has a hexadecimal code, and a list of such codes defines a palette
 grey.colors(10)
-mycolors<-c("red","white","blue")
-mycolors
+# define a user palette, either as text colors 
+DutchFlagCols<-c("blue","white","red")
+# same as hexadecimal colors
+mycolors<-c("#0000FF","#FFFFFF","#FF0000")
+barplot(rep(1,3), col = mycolors, horiz=T)
+# use existing palettes in base R, where rev() means reverse the palette order
 barplot(rep(1,10), col = rev(topo.colors(10))) # rev turns the scale arround
 barplot(rep(1,10), col = rev(terrain.colors(10)))
-# rev means reverse the palette order
+
+# find other palettes in packages, as RColorBrewer, viridis, wesanderson
 library(RColorBrewer) 
 RColorBrewer::display.brewer.all()
 barplot(rep(1,10), col = RColorBrewer::brewer.pal(10, "Spectral"))
-
 barplot(rep(1,10), col = RColorBrewer::brewer.pal(10, "BrBG"))
 library(viridis)
-barplot(rep(1,10), col = rev(viridis::viridis(10)))
-barplot(rep(1,10), col = viridis::plasma(10))
-viridis::plasma(10)
-library(wesanderson)
+barplot(rep(1,10), col = viridis::plasma(10)) # show colors
+barplot(rep(1,10), col = viridis::viridis(10))
+barplot(rep(1,10), col = viridis::inferno(10))
+barplot(rep(1,10), col = viridis::turbo(10))
+barplot(rep(1,10), col = viridis::mako(10))
+library(wesanderson) # from eg the movie "The Life Aquatic with Steve Zissou"
+# browseURL("https://www.youtube.com/watch?v=UpU0DZXTGA0") # movie trailer
 barplot(rep(1,10), col = rev(wesanderson::wes_palette("Zissou1", 10, type = "continuous")))
 pal_zissou1<-rev(wesanderson::wes_palette("Zissou1", 10, type = "continuous"))
 pal_zissou2<-wesanderson::wes_palette("Zissou1", 10, type = "continuous")
-pal_zissou1
 
-# load the vector data for the whole ecosystem
-sf::st_layers("./2022_protected_areas/protected_areas.gpkg")
+# load the vector data for the Serengeti ecosystem
+sf::st_layers("./2022_protected_areas/protected_areas.gpkg") # show which layers are in the geopackage
 protected_areas<-terra::vect("./2022_protected_areas/protected_areas.gpkg",
                              layer="protected_areas_2022") # read protected area boundaries)
+ggplot() +
+  tidyterra::geom_spatvector(data=protected_areas,
+                           fill=NA,linewidth=0.5) 
+
 sf::st_layers("./2022_rivers/rivers_hydrosheds.gpkg")
 rivers<-terra::vect("./2022_rivers/rivers_hydrosheds.gpkg",
                     layer="rivers_hydrosheds")
