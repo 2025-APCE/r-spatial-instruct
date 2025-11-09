@@ -1,4 +1,4 @@
-# course Advanced Population and Community Ecology (APCE) - 2025
+# course Advanced Population and Community Ecology (APCE) -  2025
 # Spatial analysis in R
 # Han Olff nov 2025
 
