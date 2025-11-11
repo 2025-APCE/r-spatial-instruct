@@ -128,9 +128,9 @@ elevation_map<-ggplot() +
                        oob=squish,
                        name="meters") +
   tidyterra::geom_spatvector(data=protected_areas,
-                             fill=NA,linewidth=0.5) +
+                             fill=NA,linewidth=1, col="black") +
   tidyterra::geom_spatvector(data=studyarea,
-                             fill=NA,linewidth=0.5,col="red") +
+                             fill=NA,linewidth=1,col="red") +
   tidyterra::geom_spatvector(data=lakes,
                              fill="lightblue",linewidth=0.5) +
   tidyterra::geom_spatvector(data=rivers,
@@ -144,17 +144,9 @@ elevation_map
 
 # combine the maps with patchwork
 all_maps<-woody_map +elevation_map +
-  patchwork::plot_layout(ncol=1)
+  patchwork::plot_layout(ncol=2)
 all_maps
 ggsave("./figures/all_maps_wholeEcosystem.png", width = 18, height = 18, units = "cm",dpi=300)
-
-
-# plot the rainfall map
-
-# plot the elevation map
-
-# combine the different maps  into one composite map using the patchwork library
-# and save it to a high resolution png
 
 
 ############################
@@ -181,7 +173,7 @@ woody_map_sa<-ggplot() +
   tidyterra::geom_spatvector(data=lakes,
                              fill="lightblue",linewidth=0.5) +
   tidyterra::geom_spatvector(data=rivers,
-                             col="blue",linewidth=0.5) +
+                             col="blue",linewidth=1) +
   labs(title="woody biomass") +
   coord_sf(xlimits,ylimits,expand=F,
            datum = sf::st_crs(32736)) +
