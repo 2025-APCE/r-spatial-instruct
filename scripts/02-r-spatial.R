@@ -9,7 +9,7 @@ source("scripts/01-setup.R")
 # clear the working environment
 rm(list = ls())
 # authenticate Google Sheets access
-gsheets_auth(email='m.y.name@rug.nl')  # change in your own email address
+gsheets_auth(email='h.olff@rug.nl')  # change in your own email address
 # set the working directory where your GIS data are located
 setwd("G:/Shared drives/_Org OlffLab/Teaching/APCE/_general/APCE_GIS")
 
@@ -93,9 +93,10 @@ plot(protected_areas)
 plot(elevation)
 plot(protected_areas,add=T)
 
-# set the limits of the map to show (xmin, xmax, ymin, ymax in utm36 coordinates)
+# set the limits of the large map
+# (xmin, xmax, ymin, ymax in utm36 coordinates)
 xlimits<-c(550000,900000)
-ylimits<-c(9600000,9950000)
+ylimits<-c(9600000,9900000) # adjust to 9900000 
 
 # plot the woody biomass map that you want to predict
 woody_map<-ggplot() +
@@ -103,16 +104,16 @@ woody_map<-ggplot() +
   scale_fill_gradientn(colours=rev(terrain.colors(6)),
                        limits=c(0.77,6.55),
                        oob=squish,
-                       name="TBA/ha") +
+                       name="TBA m2/ha") +
   tidyterra::geom_spatvector(data=protected_areas,
-                             fill=NA,linewidth=0.5) +
+                             fill=NA,linewidth=1, col="black") +
   tidyterra::geom_spatvector(data=studyarea,
-                             fill=NA,linewidth=0.5,col="red") +
+                             fill=NA,linewidth=1,col="red") +
   tidyterra::geom_spatvector(data=lakes,
                              fill="lightblue",linewidth=0.5) +
   tidyterra::geom_spatvector(data=rivers,
                              col="blue",linewidth=0.5) +
-  labs(title="woody biomass") +
+  labs(title="woody biomass 2016") +
   coord_sf(xlimits,ylimits,datum = sf::st_crs(32736)) +
   theme(axis.text = element_blank(),
         axis.ticks = element_blank()) +
