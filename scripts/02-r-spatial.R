@@ -387,7 +387,7 @@ rpoints_map_sa
 all_maps_sa<-woody_map_sa +dist2river_map_sa + elevation_map_sa + 
   CoreProtectedAreas_map_sa + rainfall_map_sa + 
   cec_map_sa + burnfreq_map_sa + landform_map_sa +rpoints_map_sa +
-  patchwork::plot_layout(ncol=3)
+  patchwork::plot_layout(ncol=2)
 all_maps_sa
 ggsave("./figures/all_maps_sa.png", width = 297, height = 210, units = "mm",dpi=300)
 
