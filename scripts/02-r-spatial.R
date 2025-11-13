@@ -7,7 +7,7 @@
 # clear the working environment
 rm(list = ls())
 # run the setup script for user-defined functions and Google Sheets authentication
-source("scripts/01-setup.R")
+source("C:/Users/holff/Github/2025-APCE/r-spatial-instruct/scripts/01-setup.R")
 # authenticate Google Sheets access
 gsheets_auth(email='h.olff@rug.nl')  # change in your own email address
 # set the working directory where your GIS data are located
@@ -263,7 +263,7 @@ dist2river_map_sa
 # burning frequency map from 2001 - 2016
 firefreq_sa<-terra::rast("./_MyData/fire/FireFreq.tif")
 firefreq_map_sa<-ggplot() +
-  tidyterra::geom_spatraster(data=burnfreq_sa) +
+  tidyterra::geom_spatraster(data=firefreq_sa) +
   scale_fill_gradientn(colours=pal_zissou2,
                        limits=c(0,16),
                        oob=squish,
@@ -432,12 +432,11 @@ pointdata<-cbind(dist2river_points[,2],elevation_points[,2],
                  cec_points[,2],firefreq_points[,2],
                  woody_points[,2]) |>
   as_tibble()
-pointdata
 pointdata<-pointdata[complete.cases(pointdata),]
-write_csv(pointdata,"pointdata.csv")
+pointdata
 
-getwd()
-write_csv(pointdata,"./_MyData/pointdata.csv")
+
+write_csv(pointdata,"G:/Shared drives/_Org OlffLab/Teaching/APCE/_general/APCE_GIS/_MyData/pointdata.csv")
 
 # plot how woody cover is predicted by different variables
 # Create a correlation panel plot
