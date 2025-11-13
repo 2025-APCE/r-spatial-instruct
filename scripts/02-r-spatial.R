@@ -441,7 +441,7 @@ pointdata<-pointdata[complete.cases(pointdata),]
 write_csv(pointdata,"pointdata.csv")
 
 getwd()
-readr::write_csv(pointdata,"pointdata.csv")
+write_csv(pointdata,"./_MyData/pointdata.csv")
 
 # plot how woody cover is predicted by different variables
 # Create a correlation panel plot
