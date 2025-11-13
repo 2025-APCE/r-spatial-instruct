@@ -4,10 +4,10 @@
 
 
 #--------------------------01 Set up the environment ----
-# run the setup script for user-defined functions and Google Sheets authentication
-source("scripts/01-setup.R")
 # clear the working environment
 rm(list = ls())
+# run the setup script for user-defined functions and Google Sheets authentication
+source("scripts/01-setup.R")
 # authenticate Google Sheets access
 gsheets_auth(email='h.olff@rug.nl')  # change in your own email address
 # set the working directory where your GIS data are located
@@ -75,9 +75,7 @@ lakes<-terra::vect("./lakes/lakes.gpkg",
                    layer="lakes")  
 
 # read your study area !! check if this matches indeed the name of your area
-sf::st_layers("./studyarea/studyarea.gpkg")
-studyarea<-terra::vect("./studyarea/studyarea.gpkg",
-                       layer="my_study_area")
+studyarea<-terra::vect("./studyarea/my_study_area.shp")
 
 
 # load the raster data for the whole ecosystem
@@ -263,8 +261,8 @@ dist2river_map_sa<-ggplot() +
 dist2river_map_sa
 
 # burning frequency map from 2001 - 2016
-burnfreq_sa<-terra::rast("./_MyData/fire/BurnFreq.tif")
-burnfreq_map_sa<-ggplot() +
+firefreq_sa<-terra::rast("./_MyData/fire/FireFreq.tif")
+firefreq_map_sa<-ggplot() +
   tidyterra::geom_spatraster(data=burnfreq_sa) +
   scale_fill_gradientn(colours=pal_zissou2,
                        limits=c(0,16),
@@ -284,10 +282,10 @@ burnfreq_map_sa<-ggplot() +
   theme(axis.text = element_blank(),
         axis.ticks = element_blank()) +
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
-burnfreq_map_sa
+firefreq_map_sa
 
 # soil cation exchange capacity (CEC)
-cec_sa<-terra::rast("./_MyData/soil/CEC_5_15cm.tif")
+cec_sa<-terra::rast("./_MyData/soil/cec.tif")
 hist(cec_sa)
 cec_map_sa<-ggplot() +
   tidyterra::geom_spatraster(data=cec_sa) +
@@ -310,28 +308,6 @@ cec_map_sa<-ggplot() +
         axis.ticks = element_blank()) +
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 cec_map_sa
-
-# landform hills 
-landform_sa<-terra::rast("./_MyData/landforms/hills.tif")
-landform_map_sa<-ggplot() +
-  tidyterra::geom_spatraster(data=as.factor(landform_sa)) +
-  scale_fill_manual(values=c("black","orange"),
-                    labels=c("valleys\nand\nplains","hills")) +
-  tidyterra::geom_spatvector(data=protected_areas,
-                             fill=NA,linewidth=0.7) +
-  tidyterra::geom_spatvector(data=studyarea,
-                             fill=NA,linewidth=0.5,col="green") +
-  tidyterra::geom_spatvector(data=lakes,
-                             fill="lightblue",linewidth=0.5) +
-  tidyterra::geom_spatvector(data=rivers,
-                             col="blue",linewidth=0.5) +
-  labs(title="Landform") +
-  coord_sf(xlimits,ylimits,expand=F,
-           datum = sf::st_crs(32736)) +
-  theme(axis.text = element_blank(),
-        axis.ticks = element_blank()) +
-  ggspatial::annotation_scale(location="bl",width_hint=0.2)
-landform_map_sa
 
 
 # core_protected_areas  map 
@@ -360,6 +336,27 @@ CoreProtectedAreas_map_sa<-ggplot() +
   ggspatial::annotation_scale(location="bl",width_hint=0.2)
 CoreProtectedAreas_map_sa
 
+plains_sa<-terra::rast("./_mydata/landforms/plains.tif") 
+plains_map_sa<-ggplot() +
+  tidyterra::geom_spatraster(data=as.factor(plains_sa)) +
+  scale_fill_manual(values=c("grey","darkgreen"),
+                    labels=c("no","yes")) +
+  tidyterra::geom_spatvector(data=protected_areas,
+                             fill=NA,linewidth=0.5) +
+  tidyterra::geom_spatvector(data=studyarea,
+                             fill=NA,linewidth=0.5,col="red") +
+  tidyterra::geom_spatvector(data=lakes,
+                             fill="lightblue",linewidth=0.5) +
+  tidyterra::geom_spatvector(data=rivers,
+                             col="blue",linewidth=0.5) +
+  labs(title="Landform: plains") +
+  coord_sf(xlimits,ylimits,expand=F,
+           datum = sf::st_crs(32736)) +
+  theme(axis.text = element_blank(),
+        axis.ticks = element_blank()) +
+  ggspatial::annotation_scale(location="bl",width_hint=0.2)
+plains_map_sa
+
 # create 250 random points in your study area
 set.seed(123)
 rpoints <- terra::spatSample(studyarea, size = 250, 
@@ -384,10 +381,10 @@ rpoints_map_sa<-ggplot() +
 rpoints_map_sa
 
 # combine the maps with patchwork
-all_maps_sa<-woody_map_sa +dist2river_map_sa + elevation_map_sa + 
-  CoreProtectedAreas_map_sa + rainfall_map_sa + 
-  cec_map_sa + burnfreq_map_sa + landform_map_sa +rpoints_map_sa +
-  patchwork::plot_layout(ncol=2)
+all_maps_sa<-woody_map_sa + rpoints_map_sa + dist2river_map_sa + elevation_map_sa + 
+  CoreProtectedAreas_map_sa +  plains_map_sa +rainfall_map_sa + 
+  cec_map_sa + firefreq_map_sa    +
+  patchwork::plot_layout(ncol=3)
 all_maps_sa
 ggsave("./figures/all_maps_sa.png", width = 297, height = 210, units = "mm",dpi=300)
 
@@ -409,6 +406,11 @@ CorProtAr_points <- terra::extract(CoreProtectedAreas_sa, rpoints) |>
   as_tibble() |>
   dplyr::rename(CorProtAr=CoreProtectedAreas)
 CorProtAr_points
+plains_points <- terra::extract(plains_sa, rpoints) |> 
+  as_tibble() |>
+  dplyr::rename(plains=remapped)
+plains_points
+
 rainfall_points <- terra::extract(rainfall_sa, rpoints) |> 
   as_tibble() |> 
   dplyr::rename(rainfall=CHIRPS_MeanAnnualRainfall)
@@ -417,24 +419,18 @@ cec_points <- terra::extract(cec_sa, rpoints) |>
   as_tibble() |>
   dplyr::rename(cec='cec_5-15cm_mean')
 cec_points
-burnfreq_points <- terra::extract(burnfreq_sa, rpoints) |> 
+firefreq_points <- terra::extract(firefreq_sa, rpoints) |> 
   as_tibble() |>
-  dplyr::rename(burnfreq=burned_sum)
-burnfreq_points
-landform_points <- terra::extract(landform_sa, rpoints) |> 
-  as_tibble() |>
-  dplyr::rename(hills=remapped)
-landform_points
-
-
+  dplyr::rename(firefreq=burned_sum)
+firefreq_points
 
 
 # merge the different variable into a single table
 # use woody biomass as the last variable
 pointdata<-cbind(dist2river_points[,2],elevation_points[,2],
-                 CorProtAr_points[,2],rainfall_points[,2], 
-                 cec_points[,2],burnfreq_points[,2],
-                 landform_points[,2],woody_points[,2]) |>
+                 CorProtAr_points[,2],plains_points[,2], rainfall_points[,2], 
+                 cec_points[,2],firefreq_points[,2],
+                 woody_points[,2]) |>
   as_tibble()
 pointdata
 pointdata<-pointdata[complete.cases(pointdata),]
